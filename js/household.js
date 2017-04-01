@@ -144,20 +144,19 @@ function household_bargraph_load() {
       
     var data = [];
     $.ajax({                                      
-        url: path+"average",                         
-        data: "id="+4+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=1&limitinterval=1",
+        url: path+"data",                         
+        data: "id="+feeds["use_kwh"].id+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=1&limitinterval=1",
         dataType: 'json',
-        async: true,                      
+        async: true,                  
         success: function(result) {
             if (!result || result===null || result==="" || result.constructor!=Array) {
                 console.log("ERROR","feed.getdata invalid response: "+result);
             } else {
-                var household_data = result;
-                var total = 0;
-                for (var z in household_data) {
-                   total += household_data[z][1];
+                var household_data = [];
+                for (var z=1; z<result.length; z++) {
+                    var kwh = result[z][1] - result[z-1][1];
+                    household_data.push([result[z-1][0],kwh]);
                 }
-                console.log("Total kWh in window: "+total.toFixed(2));
                 householdseries = [];
                 householdseries.push({data:household_data, color:"rgba(0,71,121,0.7)"});
                 household_bargraph_draw();

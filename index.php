@@ -130,6 +130,10 @@ switch ($q)
         $content = file_get_contents("$local_emoncms/feed/value.json?id=".get("id")."&apikey=$local_emoncms_apikey");
         break;
 
+    case "feedlist":
+        $format = "text";
+        $content = file_get_contents("$local_emoncms/feed/list.json?apikey=$local_emoncms_apikey");
+        break;
     
     // ------------------------------------------------------------------------
     // User    

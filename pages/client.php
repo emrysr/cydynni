@@ -430,6 +430,11 @@ var path = "<?php echo $path; ?>";
 var session = JSON.parse('<?php echo json_encode($session); ?>');
 var translation = <?php echo json_encode($translation,JSON_HEX_APOS);?>;
 var lang = "<?php echo $lang; ?>";
+var tmp = feedlist();
+var feeds = {};
+for (var z in tmp) {
+    feeds[tmp[z].name] = tmp[z];
+}
 
 // Navigation control
 var req = parse_location_hash(window.location.hash);
@@ -605,6 +610,13 @@ function parse_location_hash(hash)
     hash = hash.replace("&","/");
     hash = hash.split("/");
     return hash;
+}
+
+// Fetch emoncms feed list
+function feedlist()
+{ 
+    $.ajax({ url: path+"feedlist", dataType: 'json', async: false, success: function(data) {result = data;} });
+    return result;
 }
 
 </script>
