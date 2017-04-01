@@ -7,9 +7,20 @@ Household page
 var household_pie_data = [];
 var household_hydro_use = 0;
 var householdseries = [];
+var household_interval = false;
+
+
+function update_realtime(){
+    $.ajax({ url: path+"value?id="+feeds["use"].id, dataType: 'json', async: true, success: function(data) {
+        $("#realtime-power").html(feeds["use"].value);
+    }});
+}
 
 function household_load()
 {
+  update_realtime();
+  if (!household_interval) household_interval = setInterval(update_realtime,5000);
+
   $.ajax({                                      
       url: path+"household/data",
       dataType: 'json',                  
