@@ -26,12 +26,16 @@ require "core.php";
 require "meter_data_api.php";
 require "mysql_store.php";
 require "test_user.php";
+require "household_process.php";
 
 $path = get_application_path();
 $mysqli = @new mysqli($mysql['server'],$mysql['username'],$mysql['password'],$mysql['database']);
 
 $redis = new Redis();
 $connected = $redis->connect("localhost");
+
+$local_emoncms = "http://localhost/emoncms";
+$local_emoncms_apikey = "a28fa47b30c74ba9bfd5e7ee63279d47";
 
 // ---------------------------------------------------------
 require("user_model.php");
@@ -77,9 +81,8 @@ switch ($q)
     case "household/data":
         if ($session && isset($session['apikey'])) {
             $format = "json";
-            $content = get_household_consumption($meter_data_api_baseurl,$session['apikey']);
+            $content = get_household_data($local_emoncms_apikey,4);
         }
-        if (isset($session["userid"]) && $session["userid"]==$test_user) $content = $test_user_household_last_day_summary;
         break;
 
     case "hydro":
@@ -90,25 +93,43 @@ switch ($q)
     case "community/data":
         $format = "json";
         $content = json_decode($redis->get("cydynni:community:data"));
-        //$content = get_community_consumption($meter_data_api_baseurl,$meter_data_api_hydrotoken);
         break;
         
     case "community/halfhourlydata":
         $format = "json";
         $content = json_decode($redis->get("cydynni:community:halfhourlydata"));
-        //$content = get_meter_data($meter_data_api_baseurl,$meter_data_api_hydrotoken,11);
         break;
         
     // ------------------------------------------------------------------------
-    // Emoncms.org feed    
+    // Household consumption feeds from emoncms   
     // ------------------------------------------------------------------------
     
     case "data":
         $format = "json";
-        if ($session && isset($session['apikey'])) $content = get_meter_data($meter_data_api_baseurl,$session['apikey'],10);
-        // test user:
-        if (isset($session["userid"]) && $session["userid"]==$test_user) $content = $test_user_household_meter_data;
+        // Interval
+        if (isset($_GET['interval']))
+            $content = json_decode(file_get_contents("$local_emoncms/feed/data.json?id=".get("id")."&start=".get("start")."&end=".get("end")."&interval=".get("interval")."&skipmissing=".get("skipmissing")."&limitinterval=".get("limitinterval")."&apikey=$local_emoncms_apikey"));
+        // Mode
+        if (isset($_GET['mode']))
+            $content = json_decode(file_get_contents("$local_emoncms/feed/data.json?id=".get("id")."&start=".get("start")."&end=".get("end")."&mode=".get("mode")."&apikey=$local_emoncms_apikey"));
         break;
+        
+    case "average":
+        $format = "json";
+        // Interval
+        if (isset($_GET['interval']))
+            $content = json_decode(file_get_contents("$local_emoncms/feed/average.json?id=".get("id")."&start=".get("start")."&end=".get("end")."&interval=".get("interval")."&skipmissing=".get("skipmissing")."&limitinterval=".get("limitinterval")."&apikey=$local_emoncms_apikey"));
+        // Mode
+        if (isset($_GET['mode']))
+            $content = json_decode(file_get_contents("$local_emoncms/feed/average.json?id=".get("id")."&start=".get("start")."&end=".get("end")."&mode=".get("mode")."&apikey=$local_emoncms_apikey"));
+            
+        break;
+                
+    case "value":
+        $format = "text";
+        $content = file_get_contents("$local_emoncms/feed/value.json?id=".get("id")."&apikey=$local_emoncms_apikey");
+        break;
+
     
     // ------------------------------------------------------------------------
     // User    

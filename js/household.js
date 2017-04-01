@@ -106,7 +106,7 @@ function household_pie_draw() {
     piegraph("household_piegraph_placeholder",household_pie_data,household_hydro_use,options);
 }
 
-
+/*
 function household_bargraph_load() {
       
     var data = [];
@@ -119,6 +119,39 @@ function household_bargraph_load() {
                 console.log("ERROR","invalid response: "+result);
             } else {
 
+                var household_data = result;
+                var total = 0;
+                for (var z in household_data) {
+                   total += household_data[z][1];
+                }
+                console.log("Total kWh in window: "+total.toFixed(2));
+                householdseries = [];
+                householdseries.push({data:household_data, color:"rgba(0,71,121,0.7)"});
+                household_bargraph_draw();
+            }
+        }
+    });
+}*/
+
+function household_bargraph_load() {
+
+    var end = +new Date;
+    var start = end - (3600000*24.0*1);
+    var interval = 1800;
+    var intervalms = interval * 1000;
+    end = Math.floor(end / intervalms) * intervalms;
+    start = Math.floor(start / intervalms) * intervalms;
+      
+    var data = [];
+    $.ajax({                                      
+        url: path+"average",                         
+        data: "id="+4+"&start="+start+"&end="+end+"&interval="+interval+"&skipmissing=1&limitinterval=1",
+        dataType: 'json',
+        async: true,                      
+        success: function(result) {
+            if (!result || result===null || result==="" || result.constructor!=Array) {
+                console.log("ERROR","feed.getdata invalid response: "+result);
+            } else {
                 var household_data = result;
                 var total = 0;
                 for (var z in household_data) {
