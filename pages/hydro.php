@@ -70,27 +70,16 @@
         <!-- (<span id="kWhHH"></span> kWh/<?php echo t("half-hour");?>)-->
         <?php echo t("Currently generating");?> <b><span id="power"></span> kW</b>
       </div>
-
-<<<<<<< HEAD
-    <div style="text-align:center">
-    <div style="margin-bottom:5px" id="hydro-graph-date"><?php echo t("Last 24 hours");?>:</div>
-    <!--
-    <div id="hydro_bargraph_placeholder_bound" style="height:100%">
-      <canvas id="hydro_bargraph_placeholder"></canvas>
-    </div>-->
-    <div id="hydro_bargraph_placeholder_bound" style="width:100%; height:500px;">
-      <div id="hydro_bargraph_placeholder" style="height:500px"></div>
     </div>
-    
-=======
-      <div style="text-align:center">
+    <div style="text-align:center">
       <div style="margin-bottom:5px" id="hydro-graph-date"><?php echo t("Last 24 hours");?>:</div>
+      <!--
       <div id="hydro_bargraph_placeholder_bound" style="height:100%">
         <canvas id="hydro_bargraph_placeholder"></canvas>
+      </div>-->
+      <div id="hydro_bargraph_placeholder_bound" style="width:100%; height:500px;">
+        <div id="hydro_bargraph_placeholder" style="height:500px"></div>
       </div>
-      </div>
->>>>>>> a16a39f1a956ff1c44ca5467bf170e1580d1c65a
     </div>
   </div>
-
 </div>

@@ -31,18 +31,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-    <div id="community_bargraph" style="display:none; text-align:left">
-    <div style="margin-bottom:5px"><?php echo t("Community Half-hourly Demand");?>: <span id="community-graph-date"></span></div>
-    <!--
-    <div id="community_bargraph_bound">
-      <canvas id="community_bargraph_placeholder"></canvas>
-    </div>-->
-    <div id="community_bargraph_bound" style="width:100%; height:500px;">
-      <div id="community_bargraph_placeholder" style="height:500px"></div>
-    </div>
-    </div>
-=======
   <!-- BREAKDOWN TAB ------------------------------------------------------->
   <div class="pagesection" style="color:rgb(142,77,0);">
     <div style="height:10px; background-color:rgb(142,77,0)"></div>
@@ -77,11 +65,10 @@
           <div class="legend-label-box" style="background-color:#00cc00"></div>
           <span class="legend-label" >Hydro</span>
       </div>
-      <div id="community_bargraph_bound">
-        <canvas id="community_bargraph_placeholder"></canvas>
+        <div id="community_bargraph_bound" style="width:100%; height:500px;">
+          <div id="community_bargraph_placeholder" style="height:500px"></div>
+        </div>
       </div>
-      </div>
->>>>>>> a16a39f1a956ff1c44ca5467bf170e1580d1c65a
 
     </div>
   </div>
