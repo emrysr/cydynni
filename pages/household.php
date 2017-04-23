@@ -94,9 +94,14 @@
 
       <div id="household_bargraph" style="display:none; text-align:left">
       <div style="margin-bottom:5px"><?php echo t("Half-hourly Demand");?>:</div>
+      <!--
       <div id="household_bargraph_bound">
         <canvas id="household_bargraph_placeholder"></canvas>
-      </div>
+      </div>-->
+      
+        <div id="household_bargraph_bound" style="width:100%; height:500px;">
+          <div id="household_bargraph_placeholder" style="height:500px"></div>
+        </div>
       </div>
     </div>
   </div>

@@ -51,8 +51,12 @@
 
     <div id="community_bargraph" style="display:none; text-align:left">
     <div style="margin-bottom:5px"><?php echo t("Community Half-hourly Demand");?>: <span id="community-graph-date"></span></div>
+    <!--
     <div id="community_bargraph_bound">
       <canvas id="community_bargraph_placeholder"></canvas>
+    </div>-->
+    <div id="community_bargraph_bound" style="width:100%; height:500px;">
+      <div id="community_bargraph_placeholder" style="height:500px"></div>
     </div>
     </div>
 

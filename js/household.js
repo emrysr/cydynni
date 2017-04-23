@@ -4,11 +4,11 @@ Household page
 
 */
 
+var household_data = [];
 var household_pie_data = [];
 var household_hydro_use = 0;
 var householdseries = [];
 var household_interval = false;
-
 
 function update_realtime(){
     $.ajax({ url: path+"value?id="+feeds["use"].id, dataType: 'json', async: true, success: function(data) {
@@ -20,7 +20,7 @@ function household_load()
 {
   update_realtime();
   if (!household_interval) household_interval = setInterval(update_realtime,5000);
-
+  /*
   $.ajax({                                      
       url: path+"household/data",
       dataType: 'json',                  
@@ -97,6 +97,7 @@ function household_load()
           household_pie_draw();
       } 
   });
+  */
 }
 
 function household_pie_draw() {
@@ -142,7 +143,8 @@ function household_bargraph_load() {
             }
         }
     });
-}*/
+}
+*/
 
 function household_bargraph_load() {
 
@@ -163,13 +165,18 @@ function household_bargraph_load() {
             if (!result || result===null || result==="" || result.constructor!=Array) {
                 console.log("ERROR","feed.getdata invalid response: "+result);
             } else {
-                var household_data = [];
+                household_data = [];
                 for (var z=1; z<result.length; z++) {
                     var kwh = result[z][1] - result[z-1][1];
                     household_data.push([result[z-1][0],kwh]);
                 }
+                
                 householdseries = [];
-                householdseries.push({data:household_data, color:"rgba(0,71,121,0.7)"});
+                householdseries.push({
+                    data: household_data, color: "#44b3e2",
+                    bars: { show: true, align: "center", barWidth: 0.75*3600*0.5*1000, fill: 1.0, lineWidth:0}
+                });
+                
                 household_bargraph_draw();
             }
         }
@@ -182,14 +189,47 @@ function household_resize(panel_height) {
 }
 
 function household_bargraph_draw() {
-    bargraph("household_bargraph_placeholder",householdseries, " kWh","rgba(0,71,121,0.7)");
+
+    var options = {
+        xaxis: { 
+            mode: "time", 
+            timezone: "browser", 
+            font: {size:flot_font_size, color:"#666"}, 
+            // labelHeight:-5
+            reserveSpace:false
+        },
+        yaxis: { 
+            font: {size:flot_font_size, color:"#666"}, 
+            // labelWidth:-5
+            reserveSpace:false,
+            min:0
+        },
+        selection: { mode: "x" },
+        grid: {
+            show:true, 
+            color:"#aaa",
+            borderWidth:0,
+            hoverable: true, 
+            clickable: true
+        }
+    }
+
+    var plot = $.plot($('#household_bargraph_placeholder'),householdseries,options);
+    $('#household_bargraph_placeholder').append("<div id='bargraph-label' style='position:absolute;left:50px;top:30px;color:#666;font-size:12px'></div>");
+
+    // bargraph("household_bargraph_placeholder",householdseries, " kWh","rgba(0,71,121,0.7)");
 }
 
 function household_bargraph_resize(h) {
+
+    var window_width = $(window).width();
+    flot_font_size = 12;
+    if (window_width<450) flot_font_size = 10;
+
     width = $("#household_bargraph_bound").width();
-    $("#household_bargraph_placeholder").attr('width',width);
-    $('#household_bargraph_bound').attr("height",h);
-    $('#household_bargraph_placeholder').attr("height",h);
+    $("#household_bargraph_placeholder").width(width);
+    $('#household_bargraph_bound').height(h);
+    $('#household_bargraph_placeholder').height(h);
     height = h;
     household_bargraph_draw();
 }
@@ -212,4 +252,26 @@ $("#view-household-piechart").click(function(){
     
     $("#household_piegraph").show();
     $("#household_bargraph").hide();
+});
+
+$('#household_bargraph_placeholder').bind("plothover", function (event, pos, item) {
+    if (item) {
+        var z = item.dataIndex;
+        
+        if (previousPoint != item.datapoint) {
+            previousPoint = item.datapoint;
+
+            $("#tooltip").remove();
+            var itemTime = item.datapoint[0];
+            var elec_kwh = household_data[z][1];
+
+            var d = new Date(itemTime);
+            var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            var mins = d.getMinutes();
+            if (mins==0) mins = "00";
+            var date = d.getHours()+":"+mins+" "+days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate();
+            tooltip(item.pageX, item.pageY, date+"<br>"+(elec_kwh).toFixed(3)+" kWh", "#fff");
+        }
+    } else $("#tooltip").remove();
 });

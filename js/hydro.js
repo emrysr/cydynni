@@ -82,9 +82,21 @@ function hydro_load() {
                     $("#hydrostatus").html(t("NO DATA"));
                 }
                 
+                // hydroseries = [];
+                // hydroseries.push({data:hydro_data, color:"rgba(39,78,63,0.7)"});
+                // hydroseries.push({data:forecast, color:"rgba(39,78,63,0.2)"});
+                // hydro_resize(panel_height);
+
                 hydroseries = [];
-                hydroseries.push({data:hydro_data, color:"rgba(39,78,63,0.7)"});
-                hydroseries.push({data:forecast, color:"rgba(39,78,63,0.2)"});
+                hydroseries.push({
+                    data: forecast, color: "#d3dbd8",
+                    bars: { show: true, align: "center", barWidth: 0.75*3600*0.5*1000, fill: 1.0, lineWidth:0}
+                });
+                hydroseries.push({
+                    data: hydro_data, color: "#678278",
+                    bars: { show: true, align: "center", barWidth: 0.75*3600*0.5*1000, fill: 1.0, lineWidth:0}
+                });
+
                 hydro_resize(panel_height);
                 
 
@@ -94,17 +106,58 @@ function hydro_load() {
 }
 
 function hydro_draw() {
-    bargraph("hydro_bargraph_placeholder",hydroseries," kWh","rgba(39,78,63,0.7)");
+
+    var options = {
+        xaxis: { 
+            mode: "time", 
+            timezone: "browser", 
+            font: {size:flot_font_size, color:"#666"}, 
+            // labelHeight:-5
+            reserveSpace:false
+        },
+        yaxis: { 
+            font: {size:flot_font_size, color:"#666"}, 
+            // labelWidth:-5
+            reserveSpace:false,
+            min:0
+        },
+        selection: { mode: "x" },
+        grid: {
+            show:true, 
+            color:"#aaa",
+            borderWidth:0,
+            hoverable: true, 
+            clickable: true
+        }
+    }
+
+    var plot = $.plot($('#hydro_bargraph_placeholder'),hydroseries,options);
+    $('#hydro_bargraph_placeholder').append("<div id='bargraph-label' style='position:absolute;left:50px;top:30px;color:#666;font-size:12px'></div>");
+
+    // bargraph("hydro_bargraph_placeholder",hydroseries," kWh","rgba(39,78,63,0.7)");
 }
 
 function hydro_resize(panel_height) {
+    
+    var window_width = $(window).width();
+    flot_font_size = 12;
+    if (window_width<450) flot_font_size = 10;
+        
+    // var h = panel_height-120;
+    // width = $("#hydro_bargraph_placeholder_bound").width();
+    // $("#hydro_bargraph_placeholder").attr('width',width);
+    // $('#hydro_bargraph_placeholder_bound').attr("height",h);
+    // $('#hydro_bargraph_placeholder').attr("height",h);
+    // height = h
+    // hydro_draw(); 
+
     var h = panel_height-120;
     width = $("#hydro_bargraph_placeholder_bound").width();
-    $("#hydro_bargraph_placeholder").attr('width',width);
-    $('#hydro_bargraph_placeholder_bound').attr("height",h);
-    $('#hydro_bargraph_placeholder').attr("height",h);
-    height = h
-    hydro_draw(); 
+    $("#hydro_bargraph_placeholder").width(width);
+    $('#hydro_bargraph_placeholder_bound').height(h);
+    $('#hydro_bargraph_placeholder').height(h);
+    height = h;
+    hydro_draw();
 }
 
 function hydro_forecaster(time,power,lastpower) {
@@ -179,3 +232,27 @@ function hydro_forecaster(time,power,lastpower) {
     
     return forecast;
 }
+
+$('#hydro_bargraph_placeholder').bind("plothover", function (event, pos, item) {
+    if (item) {
+        var z = item.dataIndex;
+        
+        if (previousPoint != item.datapoint) {
+            previousPoint = item.datapoint;
+
+            $("#tooltip").remove();
+            var itemTime = item.datapoint[0];
+            var elec_kwh = hydroseries[item.seriesIndex].data[z][1];
+            var note = "";
+            if (item.seriesIndex==0) note = "Forecast ";
+
+            var d = new Date(itemTime);
+            var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+            var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+            var mins = d.getMinutes();
+            if (mins==0) mins = "00";
+            var date = d.getHours()+":"+mins+" "+days[d.getDay()]+", "+months[d.getMonth()]+" "+d.getDate();
+            tooltip(item.pageX, item.pageY, date+"<br>"+note+(elec_kwh).toFixed(0)+" kWh", "#fff");
+        }
+    } else $("#tooltip").remove();
+});
