@@ -7,7 +7,7 @@ cd
 apikey="$(php /home/pi/cydynni/ota/getapikey.php)"
 local_ota_version="$(cat cydynni/ota/version)"
 
-url="https://emoncms.cydynni.org.uk/cydynni/ota-version?hub=$local_ota_version&apikey=$apikey"
+url="https://emoncms.org/cydynni/ota-version?hub=$local_ota_version&apikey=$apikey"
 remote_ota_version="$(curl -s $url)"
 
 if [ "$remote_ota_version" -ne "$local_ota_version" ]
@@ -16,13 +16,13 @@ then
   echo "Update available, starting update process.."
   rpi-rw
   cd cydynni
-  git pull origin master
+  git pull origin ESC
   cd ota
   log=$(./main.sh)
   cd
   rpi-ro
 
   echo $"$log"
-  url="https://emoncms.cydynni.org.uk/cydynni/ota-log-set?apikey=$apikey"
+  url="https://emoncms.org/cydynni/ota-log-set?apikey=$apikey"
   $(curl -s -X POST -d "$log" $url)
 fi
