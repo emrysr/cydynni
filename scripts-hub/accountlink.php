@@ -39,12 +39,15 @@ if ($result!=null && isset($result->success) && $result->success) {
 
     // Fetch full account details from remote emoncms
     $u = json_decode(file_get_contents("https://emoncms.org/user/get.json?apikey=".$result->apikey_write));
+    print json_encode($u)."\n";
     
     // Register account locally
     $result = $user->register($username, $password, $u->email);
     
     // Save remote account apikey to local hub
     if ($result['success']==true) {
+        print "Updating apikeys\n";
+        
         $userid = $result['userid'];
         $mysqli->query("UPDATE users SET apikey_write = '".$u->apikey_write."' WHERE id='$userid'");
         $mysqli->query("UPDATE users SET apikey_read = '".$u->apikey_read."' WHERE id='$userid'");
@@ -54,5 +57,7 @@ if ($result!=null && isset($result->success) && $result->success) {
         $fh = fopen("/home/pi/data/emonhub.conf","w");        
         fwrite($fh,$emonhubconf);                
         fclose($fh);
+    } else {
+        print json_encode($result)."\n";
     }
 }
