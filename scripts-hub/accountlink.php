@@ -42,7 +42,7 @@ if ($result!=null && isset($result->success) && $result->success) {
     print json_encode($u)."\n";
     
     // Register account locally
-    $result = $user->register($u->username, $u->password, $u->email);
+    $result = $user->register($emoncms_username, $emoncms_password, $u->email);
     
     // Save remote account apikey to local hub
     if ($result['success']==true) {
