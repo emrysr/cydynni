@@ -53,7 +53,7 @@ if ($result!=null && isset($result->success) && $result->success) {
         $mysqli->query("UPDATE users SET apikey_read = '".$u->apikey_read."' WHERE id='$userid'");
         
         $emonhubconf = file_get_contents("/home/pi/data/emonhub.conf");
-        $emonhubconf = str_replace($emonhubconf,"apikey = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","apikey = ".$u->apikey_write);
+        $emonhubconf = str_replace("apikey = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","apikey = ".$u->apikey_write,$emonhubconf);
         $fh = fopen("/home/pi/data/emonhub.conf","w");        
         fwrite($fh,$emonhubconf);                
         fclose($fh);
