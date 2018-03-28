@@ -7,7 +7,11 @@ $emoncms_password = readline("emoncms_password: ");
 define('EMONCMS_EXEC', 1);
 chdir("/var/www/emoncms");
 require "process_settings.php";
+require "Lib/EmonLogger.php";
+$log = new EmonLogger(__FILE__);
+
 require "Modules/user/user_model.php";
+
 
 // Connect to MYSQL
 $mysqli = @new mysqli($server,$username,$password,$database,$port);
